@@ -23,6 +23,7 @@ hexSender.stderr.on('data', function(data){
 });
 
 
+
 var color = "000000";
 
 
@@ -37,6 +38,10 @@ app.get('/color', function (req, res) {
     res.status(200).send("fainai, fainai"); //must stay low key with my compliments
     hexSender.stdin.write(req.query.color+"\n"); //write the color hex to child proc
     //all output should terminate with a newline char '\n', because it is a coded terminating character
+});
+
+app.get('/', function(req, res){
+    res.status(200).send("hai");
 });
 
 app.listen(416, function () {

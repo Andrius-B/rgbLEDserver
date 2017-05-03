@@ -22,7 +22,8 @@ def char_range(c1, c2):
         yield chr(c)
 
 def main():
-    portName = '/dev/tty/S2'
+    portName = '/dev/ttyS2'
+    #portName = 'COM3'
     """This /dev/tty naming convention is used on linux,
     though on Windows serial ports are named COM*,
     though I am running this from an Ubuntu VM on a Windows machine, so I use /dev/tty

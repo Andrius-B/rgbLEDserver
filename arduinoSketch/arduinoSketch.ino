@@ -11,6 +11,10 @@ void setup() {
   Serial.begin(9600);
 }
 int r,g,b;
+int rCurr, gCurr, bCurr;
+int rDiff, gDiff, bDiff;
+int transitionDuration = 500;//ms
+int changeBeg;
 int cycleLen = 256;//microseconds
 char color[7] = {"FFFFFF"};
 
@@ -28,23 +32,40 @@ void writeHex(char color[]){
   greenHex[2]='\0';
   blueHex[2]='\0';
   
-  r = (int)strtol(redHex, NULL, 16);
-  g = (int)strtol(greenHex, NULL, 16);
-  b = (int)strtol(blueHex, NULL, 16);
+  
+  rCurr = r;
+  rDiff = (int)strtol(redHex, NULL, 16) - rCurr;
 
-//  Serial.print("r: "+String(r)+" "+redHex);
-//  Serial.print(" g: "+String(g)+" "+greenHex);
-//  Serial.println(" b: "+String(b)+" "+blueHex);
+  gCurr = g;
+  gDiff = (int)strtol(greenHex, NULL, 16) - gCurr;
+  
+  bCurr = b;
+  bDiff = (int)strtol(blueHex, NULL, 16) - bCurr;
+  
+  changeBeg = millis();
+  
   }
+  
+void converge(int *r,int *g, int *b){
+  int timePassed = millis() - changeBeg;
+  float scale = max(-0.1,min(1.f,timePassed/(float)transitionDuration));
+  if(!(scale<0 || scale == 1)){
+  Serial.print(rDiff*scale+(float)rCurr);Serial.print(" : ");Serial.print(rCurr);Serial.print(" : ");Serial.println(*r);
+  *r = (float)rCurr + rDiff*scale;
+  *g = (float)gCurr + gDiff*scale;
+  *b = (float)bCurr + bDiff*scale;
+  }
+}
+
 
   void displayColor(){
-
+    converge(&r,&g,&b);
     long int micr = micros();
     while(micros()-micr < cycleLen/3.f){analogWrite(red, r);}
     micr = micros();
     while(micros()-micr < cycleLen/3.f){analogWrite(green, g);}
     micr = micros();
-    while(micros()-micr < cycleLen/3.f){analogWrite(blue, b*2/3);}
+    while(micros()-micr < cycleLen/3.f){analogWrite(blue, b*2/3);} //white balance for my LED
   }
 
 void loop() {
